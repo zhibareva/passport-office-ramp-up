@@ -24,24 +24,30 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public PersonDto getPerson(Long id) {
+        log.info("Searching for person with id [{}]", id);
         return personRepository.findById(id).orElse(new PersonDto());
     }
 
     @Override
     public PersonDto deletePerson(Long id) {
+        log.info("Deleting for person with id [{}]", id);
         return personRepository.deleteById(id).orElseThrow(() -> new NullPointerException("There is no person with id " + id.toString()));
     }
 
     @Override
     public PersonDto updatePerson(Long id, String firstName, String lastName, LocalDate dateOfBirth, String birthCountry) {
-        personRepository.update(id, new PersonDto(id, firstName, lastName, dateOfBirth, birthCountry));
+        PersonDto personDto = new PersonDto(id, firstName, lastName, dateOfBirth, birthCountry);
+        log.info("Updating for person with id [{}] with data [{}]", id, personDto);
+        personRepository.update(id, personDto);
         return getPerson(id);
     }
 
     @Override
     public PersonDto createPerson(String firstName, String lastName, LocalDate dateOfBirth, String birthCountry) {
         Long id = personRepository.generateId();
-        personRepository.save(id, new PersonDto(id, firstName, lastName, dateOfBirth, birthCountry));
+        PersonDto personDto = new PersonDto(id, firstName, lastName, dateOfBirth, birthCountry);
+        log.info("Creating for person with id [{}] with data [{}]", id, personDto);
+        personRepository.save(id, personDto);
         return getPerson(id);
     }
 }

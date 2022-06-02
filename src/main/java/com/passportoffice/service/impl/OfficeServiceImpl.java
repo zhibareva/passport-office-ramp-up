@@ -35,21 +35,25 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     public void addPassportToPerson(Long personId, PassportDto passportDto) {
+        log.info("Creating passport with data [{}] for person with id [{}]", passportDto, personId);
         officeRepository.save(personId, passportDto);
     }
 
     @Override
     public List<PassportDto> getPassportPerPerson(String personId) {
+        log.info("Searching for passport by person id [{}]", personId);
         return officeRepository.findById(personId).orElse(new ArrayList<>());
     }
 
     @Override
     public List<PersonDto> getPersonsByFilter(Long passportNumber) {
+        log.info("Searching for person by passport number [{}]", passportNumber);
         return officeRepository.findByFilter(passportNumber).orElseThrow(() -> new NullPointerException("There are no persons with passport number " + passportNumber));
     }
 
     @Override
     public void updatePassportPerPerson(Long personId, Long passportId, UpdatePassportRequest body) {
+        log.info("Updating passport [{}] with data [{}] for person with id [{}]", passportId, personId, body);
 
         passportRepository.update(passportId, new PassportDto(
                 passportId,
@@ -67,6 +71,7 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     public List<PassportDto> getPassportsByFilter(List<PassportDto> filteredPassports, LocalDate startDate, LocalDate endDate, String status) {
+        log.info("Searching for passport by given date range [{}] - [{}] and status [{}]", startDate, endDate, status);
         return passportRepository.findByFilter(filteredPassports, startDate, endDate, status);
     }
 }

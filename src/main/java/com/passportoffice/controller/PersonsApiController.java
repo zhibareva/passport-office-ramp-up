@@ -7,7 +7,6 @@ import com.passportoffice.dto.request.UpdatePersonRequest;
 import com.passportoffice.dto.response.PassportDto;
 import com.passportoffice.dto.response.PersonDto;
 import com.passportoffice.enums.Status;
-import com.passportoffice.exception.InvalidPassportTypeException;
 import com.passportoffice.service.impl.OfficeServiceImpl;
 import com.passportoffice.service.impl.PassportServiceImpl;
 import com.passportoffice.service.impl.PersonServiceImpl;
@@ -33,25 +32,23 @@ public class PersonsApiController implements PersonsApi {
     private final PassportServiceImpl passportService;
     private final OfficeServiceImpl officeService;
     private final PersonServiceImpl personService;
-    private final DataGenerator dataGenerator;
     private final PassportTypeValidator validator;
 
     @Autowired
     public PersonsApiController(PassportServiceImpl passportService,
                                 OfficeServiceImpl officeService,
                                 PersonServiceImpl personService,
-                                DataGenerator dataGenerator, PassportTypeValidator validator) {
+                                PassportTypeValidator validator) {
         this.passportService = passportService;
         this.officeService = officeService;
         this.personService = personService;
-        this.dataGenerator = dataGenerator;
         this.validator = validator;
     }
 
     public PassportDto addPassport(@PathVariable("id") String id, @Valid @RequestBody CreatePassportRequest body) {
-        PassportDto passportDto;
-        if(validator.isValid(Long.parseLong(id), body.getType())) {
-            passportDto = passportService.createPassport(
+
+        validator.validatePassportType(Long.parseLong(id), body.getType());
+        PassportDto passportDto = passportService.createPassport(
                     body.getType(),
                     body.getNumber(),
                     body.getGivenDate(),
@@ -60,9 +57,7 @@ public class PersonsApiController implements PersonsApi {
             );
 
             officeService.addPassportToPerson(Long.parseLong(id), passportDto);
-        } else {
-            throw new InvalidPassportTypeException("User cannot has two passports with the same type");
-        }
+
         return passportDto;
     }
 
@@ -101,8 +96,8 @@ public class PersonsApiController implements PersonsApi {
         if (updatedPassport.getStatus().equals(Status.LOST))
             return addPassport(personId.toString(), new CreatePassportRequest(
                     updatedPassport.getType(),
-                    dataGenerator.generatePassportNumber(),
-                    dataGenerator.getCurrentDate().plusDays(3),
+                    DataGenerator.generatePassportNumber(),
+                    DataGenerator.getCurrentDate().plusDays(3),
                     updatedPassport.getDepartmentCode(),
                     Status.ACTIVE
             ));
