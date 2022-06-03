@@ -5,6 +5,7 @@ import com.passportoffice.enums.Status;
 import com.passportoffice.repository.PassportRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;

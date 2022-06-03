@@ -131,8 +131,6 @@ public class PersonApiControllerTest {
                 .extract().response();
     }
 
-
-
     @Test
     public void testPassportPut() {
         String id = createTestPerson().jsonPath().getString("id");

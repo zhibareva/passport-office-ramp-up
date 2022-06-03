@@ -2,6 +2,7 @@ package com.passportoffice.controller;
 
 import com.passportoffice.dto.request.UpdatePassportRequest;
 import com.passportoffice.dto.response.PassportDto;
+import com.passportoffice.service.PassportService;
 import com.passportoffice.service.impl.PassportServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,13 +20,11 @@ import javax.validation.ValidatorFactory;
 public class PassportsApiController implements PassportsApi {
 
     private static final Logger log = LoggerFactory.getLogger(PassportsApiController.class);
-    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-    Validator validator = factory.getValidator();
 
-    private final PassportServiceImpl passportService;
+    private final PassportService passportService;
 
     @Autowired
-    public PassportsApiController(PassportServiceImpl passportService) {
+    public PassportsApiController(PassportService passportService) {
         this.passportService = passportService;
     }
 

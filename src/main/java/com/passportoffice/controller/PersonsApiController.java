@@ -7,9 +7,9 @@ import com.passportoffice.dto.request.UpdatePersonRequest;
 import com.passportoffice.dto.response.PassportDto;
 import com.passportoffice.dto.response.PersonDto;
 import com.passportoffice.enums.Status;
-import com.passportoffice.service.impl.OfficeServiceImpl;
-import com.passportoffice.service.impl.PassportServiceImpl;
-import com.passportoffice.service.impl.PersonServiceImpl;
+import com.passportoffice.service.OfficeService;
+import com.passportoffice.service.PassportService;
+import com.passportoffice.service.PersonService;
 import com.passportoffice.utils.DataGenerator;
 import com.passportoffice.validation.validator.PassportTypeValidator;
 import org.slf4j.Logger;
@@ -29,15 +29,15 @@ public class PersonsApiController implements PersonsApi {
 
     private static final Logger log = LoggerFactory.getLogger(PersonsApiController.class);
 
-    private final PassportServiceImpl passportService;
-    private final OfficeServiceImpl officeService;
-    private final PersonServiceImpl personService;
+    private final PassportService passportService;
+    private final OfficeService officeService;
+    private final PersonService personService;
     private final PassportTypeValidator validator;
 
     @Autowired
-    public PersonsApiController(PassportServiceImpl passportService,
-                                OfficeServiceImpl officeService,
-                                PersonServiceImpl personService,
+    public PersonsApiController(PassportService passportService,
+                                OfficeService officeService,
+                                PersonService personService,
                                 PassportTypeValidator validator) {
         this.passportService = passportService;
         this.officeService = officeService;
