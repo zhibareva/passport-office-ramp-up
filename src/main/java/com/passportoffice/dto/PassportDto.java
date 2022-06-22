@@ -1,7 +1,7 @@
-package com.passportoffice.dto.response;
+package com.passportoffice.dto;
 
-import com.passportoffice.enums.PassportType;
-import com.passportoffice.enums.Status;
+import com.passportoffice.model.PassportType;
+import com.passportoffice.model.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,7 +21,11 @@ public class PassportDto {
 
     @NotNull
     @Min(value = 1)
-    private Long id = 123L;
+    private Long passportId;
+
+    @NotNull
+    @Min(value = 1)
+    private Long personId;
 
     @NotNull
     private PassportType type;

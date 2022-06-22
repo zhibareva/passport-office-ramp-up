@@ -1,9 +1,10 @@
 package com.passportoffice.repository.impl;
 
-import com.passportoffice.dto.response.PersonDto;
+import com.passportoffice.dto.PersonDto;
 import com.passportoffice.repository.PersonRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -11,7 +12,16 @@ import java.util.Optional;
 @Repository
 public class PersonRepositoryImpl implements PersonRepository {
 
-    private final Map<Long, PersonDto> persons = new HashMap();
+    private final Map<Long, PersonDto> persons = new HashMap<>();
+
+    @Override
+    public Long generateId() {
+        return getPersons().size() + 1L;
+    }
+
+    public Map<Long, PersonDto> getPersons() {
+        return Collections.unmodifiableMap(persons);
+    }
 
     @Override
     public Optional<PersonDto> findById(Long id) {
@@ -33,8 +43,6 @@ public class PersonRepositoryImpl implements PersonRepository {
         persons.replace(id, passportDto);
     }
 
-    @Override
-    public Long generateId() {
-        return persons.size() + 1L;
-    }
+
+
 }

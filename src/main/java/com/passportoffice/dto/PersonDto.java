@@ -1,4 +1,4 @@
-package com.passportoffice.dto.response;
+package com.passportoffice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +18,7 @@ import java.time.LocalDate;
 public class PersonDto {
 
     @NotNull
-    private Long id = 123L;
+    private Long id;
 
     @NotEmpty
     @Pattern(regexp = "^[a-zA-Z\\s]+$")

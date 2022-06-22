@@ -16,14 +16,14 @@ public class CreatePersonRequest {
 
     @NotEmpty
     @Pattern(regexp = "^[a-zA-Z\\s]+$")
-    private String firstName;
+    private final String firstName;
 
     @NotEmpty
     @Pattern(regexp = "^[a-zA-Z\\s]+$")
-    private String lastName;
+    private final String lastName;
 
     @Past
-    private LocalDate dateOfBirth;
+    private final LocalDate dateOfBirth;
 
     @NotEmpty
     @Pattern(regexp = "^[a-zA-Z\\s]+$")

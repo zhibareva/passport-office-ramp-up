@@ -1,6 +1,6 @@
 package com.passportoffice.service;
 
-import com.passportoffice.dto.response.PersonDto;
+import com.passportoffice.dto.PersonDto;
 
 import java.time.LocalDate;
 
@@ -11,5 +11,5 @@ public interface PersonService {
 
     PersonDto updatePerson(Long id, String firstName, String lastName, LocalDate dateOfBirth, String birthCountry);
 
-    PersonDto createPerson(String firstName, String lastName, LocalDate dateOfBirth, String birthCountry);
+    PersonDto createPerson(Long personId, String firstName, String lastName, LocalDate dateOfBirth, String birthCountry);
 }

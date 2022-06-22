@@ -1,14 +1,16 @@
-package com.passportoffice.validation.validator;
+package validation.validator;
 
-import com.passportoffice.dto.response.PassportDto;
+import com.passportoffice.dto.PassportDto;
 import com.passportoffice.repository.PassportRepository;
-import com.passportoffice.validation.PassportNumber;
+import org.springframework.stereotype.Component;
+import validation.PassportNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.Collection;
 
+@Component
 public class PassportNumberValidator implements ConstraintValidator<PassportNumber, Long> {
 
     @Autowired

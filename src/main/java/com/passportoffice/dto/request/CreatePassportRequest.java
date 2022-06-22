@@ -1,8 +1,8 @@
 package com.passportoffice.dto.request;
 
-import com.passportoffice.enums.PassportType;
-import com.passportoffice.enums.Status;
-import com.passportoffice.validation.PassportNumber;
+import com.passportoffice.model.PassportType;
+import com.passportoffice.model.Status;
+import validation.PassportNumber;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -17,20 +17,20 @@ import java.time.LocalDate;
 public class CreatePassportRequest {
 
     @NonNull
-    private PassportType type;
+    private final PassportType type;
 
     @PassportNumber
     @NonNull
-    private Long number;
+    private final Long number;
 
     @NonNull
     @PastOrPresent
-    private LocalDate givenDate;
+    private final LocalDate givenDate;
 
     @NonNull
-    private String departmentCode;
+    private final String departmentCode;
 
     @NonNull
-    private Status status;
+    private final Status status;
 
 }

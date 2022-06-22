@@ -1,17 +1,17 @@
 package com.passportoffice.service;
 
-import com.passportoffice.dto.response.PassportDto;
-import com.passportoffice.enums.PassportType;
-import com.passportoffice.enums.Status;
+import com.passportoffice.dto.PassportDto;
+import com.passportoffice.model.PassportType;
+import com.passportoffice.model.Status;
 
 import java.time.LocalDate;
 
 public interface PassportService {
-    PassportDto createPassport(PassportType type, Long number, LocalDate givenDate, String depCode, Status status);
 
     PassportDto getPassportById(Long id);
 
     PassportDto deletePassportById(Long id);
 
-    PassportDto updatePassport(Long id, PassportType type, Long number, LocalDate givenDate, LocalDate expDate, String depCode, Status status);
+    PassportDto updatePassport(Long personId, Long passportID, PassportType type, Long number, LocalDate givenDate,
+                               LocalDate expDate, String depCode, Status status);
 }

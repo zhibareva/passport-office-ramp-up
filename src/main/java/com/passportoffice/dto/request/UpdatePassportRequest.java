@@ -1,8 +1,8 @@
 package com.passportoffice.dto.request;
 
-import com.passportoffice.enums.PassportType;
-import com.passportoffice.enums.Status;
-import com.passportoffice.validation.PassportNumber;
+import com.passportoffice.model.PassportType;
+import com.passportoffice.model.Status;
+import validation.PassportNumber;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

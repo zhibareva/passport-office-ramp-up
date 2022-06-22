@@ -1,10 +1,9 @@
 package com.passportoffice.repository.impl;
 
-import com.passportoffice.dto.response.PassportDto;
-import com.passportoffice.enums.Status;
+import com.passportoffice.dto.PassportDto;
+import com.passportoffice.model.Status;
 import com.passportoffice.repository.PassportRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -12,18 +11,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
+@Slf4j
 public class PassportRepositoryImpl implements PassportRepository {
-    @Override
-    public Map<Long, PassportDto> getPassports() {
-        return passports;
-    }
 
     private final Map<Long, PassportDto> passports = new HashMap<>();
-    private static final Logger log = LoggerFactory.getLogger(PassportRepositoryImpl.class);
+
+    @Override
+    public Map<Long, PassportDto> getPassports() {
+        return Collections.unmodifiableMap(passports);
+    }
 
     @Override
     public Long generateId() {
-        return passports.size() + 1L;
+        return getPassports().size() + 1L;
     }
 
     @Override
@@ -47,29 +47,29 @@ public class PassportRepositoryImpl implements PassportRepository {
     }
     
     @Override
-    public List<PassportDto> findByStatus(List<PassportDto> passports, String status) {
+    public Set<PassportDto> findByStatus(List<PassportDto> passports, String status) {
         return passports.stream().filter(
-                PassportDto -> PassportDto.getStatus().equals(Status.fromValue(status))
-        ).collect(Collectors.toList());
+                passportDto -> passportDto.getStatus().equals(Status.fromValue(status))
+        ).collect(Collectors.toSet());
     }
 
     @Override
-    public List<PassportDto> findByStartDate(List<PassportDto> passports, LocalDate startDate) {
+    public Set<PassportDto> findByStartDate(List<PassportDto> passports, LocalDate startDate) {
         return passports.stream().filter(
-                PassportDto -> PassportDto.getGivenDate().isAfter(startDate)
-        ).collect(Collectors.toList());
+                passportDto -> passportDto.getGivenDate().isAfter(startDate)
+        ).collect(Collectors.toSet());
     }
 
     @Override
-    public List<PassportDto> findByEndDate(List<PassportDto> passports, LocalDate endDate) {
+    public Set<PassportDto> findByEndDate(List<PassportDto> passports, LocalDate endDate) {
         return passports.stream().filter(
-                PassportDto -> PassportDto.getGivenDate().isBefore(endDate)
-        ).collect(Collectors.toList());
+                passportDto -> passportDto.getGivenDate().isBefore(endDate)
+        ).collect(Collectors.toSet());
     }
 
     @Override
-    public List<PassportDto> findByFilter(List<PassportDto> passportDtos, LocalDate startDate, LocalDate endDate, String status) {
-        List<PassportDto> filteredPassports = new ArrayList<>();
+    public Set<PassportDto> findByFilter(List<PassportDto> passportDtos, LocalDate startDate, LocalDate endDate, String status) {
+        Set<PassportDto> filteredPassports = new HashSet<>();
         if (startDate != null) {
             filteredPassports.addAll(findByStartDate(passportDtos, startDate));
             log.info("startDate [{}]", filteredPassports);

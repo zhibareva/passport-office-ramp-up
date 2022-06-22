@@ -1,50 +1,32 @@
 package com.passportoffice.controller;
 
-import com.passportoffice.dto.request.UpdatePassportRequest;
-import com.passportoffice.dto.response.PassportDto;
+import com.passportoffice.dto.response.PassportResponse;
+import com.passportoffice.mapper.PassportEntitiesMapper;
 import com.passportoffice.service.impl.PassportServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 
 @RestController
-public class PassportsApiController implements PassportsApi {
-
-    private static final Logger log = LoggerFactory.getLogger(PassportsApiController.class);
-    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-    Validator validator = factory.getValidator();
+@AllArgsConstructor
+@Slf4j
+public class PassportsApiController {
 
     private final PassportServiceImpl passportService;
+    private final PassportEntitiesMapper mapper;
 
-    @Autowired
-    public PassportsApiController(PassportServiceImpl passportService) {
-        this.passportService = passportService;
+    @RequestMapping(value = "/passports/{id}", produces = {"application/json"}, method = RequestMethod.DELETE)
+    public PassportResponse deletePassport(@Valid @PathVariable("id") Long id) {
+        return mapper.toResponse(passportService.deletePassportById(id));
     }
 
-    public PassportDto deletePassport(@Valid @PathVariable("id") Long id) {
-        return passportService.deletePassportById(id);
-    }
-
-    public PassportDto getPassportById(@Valid @PathVariable("id") Long id) {
-        return passportService.getPassportById(id);
-    }
-
-    public PassportDto updatePassport(@Valid @PathVariable("id") String id, @Valid @RequestBody UpdatePassportRequest body) {
-        return passportService.updatePassport(
-                Long.parseLong(id),
-                body.getType(),
-                body.getNumber(),
-                body.getGivenDate(),
-                body.getExpirationDate(),
-                body.getDepartmentCode(),
-                body.getStatus());
+    @RequestMapping(value = "/passports/{id}", produces = {"application/json"}, method = RequestMethod.GET)
+    public PassportResponse getPassportById(@Valid @PathVariable("id") Long id) {
+        return mapper.toResponse(passportService.getPassportById(id));
     }
 }

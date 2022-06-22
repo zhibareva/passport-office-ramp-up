@@ -1,11 +1,8 @@
-package com.passportoffice.test;
-
 import com.passportoffice.Application;
-import com.passportoffice.dto.request.CreatePassportRequest;
 import com.passportoffice.dto.request.CreatePersonRequest;
 import com.passportoffice.dto.request.UpdatePersonRequest;
-import com.passportoffice.enums.PassportType;
-import com.passportoffice.enums.Status;
+import com.passportoffice.model.PassportType;
+import com.passportoffice.model.Status;
 import com.passportoffice.utils.DataGenerator;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -17,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 
-import static com.passportoffice.test.PassportApiControllerTest.createTestPassport;
 import static io.restassured.RestAssured.given;
 
 @SpringBootTest(classes = Application.class)
@@ -71,8 +67,8 @@ public class PersonApiControllerTest {
     @Test
     public void testPersonGetByFilter() {
         String id = createTestPerson().jsonPath().getString("id");
-        Response passport = createTestPassport(id, PassportType.CITIZEN, Status.ACTIVE);
-        Response passport2 = createTestPassport(id, PassportType.CITIZEN, Status.ACTIVE);
+        Response passport = PassportApiControllerTest.createTestPassport(id, PassportType.CITIZEN, Status.ACTIVE);
+        Response passport2 = PassportApiControllerTest.createTestPassport(id, PassportType.CITIZEN, Status.ACTIVE);
         given().
                 header("Accept", "application/json").
                 when().request("GET", "/persons?passportNumber=" + passport.jsonPath().getString("number")).then().statusCode(200);
@@ -111,7 +107,7 @@ public class PersonApiControllerTest {
     @Test
     public void testPassportPost() {
         String id = createTestPerson().jsonPath().getString("id");
-        Response response = createTestPassport(id, PassportType.CITIZEN, Status.ACTIVE);
+        Response response = PassportApiControllerTest.createTestPassport(id, PassportType.CITIZEN, Status.ACTIVE);
 
         Assert.assertEquals(200, response.statusCode());
         Assert.assertEquals("active", response.jsonPath().getString("status"));
@@ -120,14 +116,14 @@ public class PersonApiControllerTest {
     @Test
     public void testPassportGetByFilter() {
         String id = createTestPerson().jsonPath().getString("id");
-        Response passport = createTestPassport(id, PassportType.CITIZEN, Status.ACTIVE);
-        Response passport1 = createTestPassport(id, PassportType.SAILOR, Status.ACTIVE);
-        Response passport2 = createTestPassport(id, PassportType.INTERNATIONAL, Status.ACTIVE);
-        Response passport3 = createTestPassport(id, PassportType.SAILOR, Status.INACTIVE);
+        Response passport = PassportApiControllerTest.createTestPassport(id, PassportType.CITIZEN, Status.ACTIVE);
+        Response passport1 = PassportApiControllerTest.createTestPassport(id, PassportType.SAILOR, Status.ACTIVE);
+        Response passport2 = PassportApiControllerTest.createTestPassport(id, PassportType.INTERNATIONAL, Status.ACTIVE);
+        Response passport3 = PassportApiControllerTest.createTestPassport(id, PassportType.SAILOR, Status.INACTIVE);
 
         Response passports = given().
                 header("Accept", "application/json").
-                when().request("GET", "/persons/" + id + "/passports").then()
+                when().request("GET", "/persons/" + id + "/passports?status=active").then()
                 .extract().response();
     }
 
@@ -136,7 +132,7 @@ public class PersonApiControllerTest {
     @Test
     public void testPassportPut() {
         String id = createTestPerson().jsonPath().getString("id");
-        Response createResponse = createTestPassport(id, PassportType.CITIZEN, Status.ACTIVE);
+        Response createResponse = PassportApiControllerTest.createTestPassport(id, PassportType.CITIZEN, Status.ACTIVE);
 
         Assert.assertEquals(200, createResponse.statusCode());
         Assert.assertEquals("active", createResponse.jsonPath().getString("status"));
