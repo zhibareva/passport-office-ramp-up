@@ -5,14 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {
-        "com.passportoffice",
-        "com.passportoffice.api",
-        "com.passportoffice.configuration",
-        "com.passportoffice.service",
-        "validation.validator",
-        "test"
-})
+@ComponentScan(basePackages = {"com.passportoffice", "com.passportoffice.api", "com.passportoffice.configuration", "com.passportoffice.service", "com.passportoffice.test"})
 public class Application {
 
     public static void main(String[] args) {

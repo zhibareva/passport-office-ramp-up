@@ -19,8 +19,7 @@ public class CommonExceptionHandler {
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                e.getMessage()
-        );
+                e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -30,8 +29,7 @@ public class CommonExceptionHandler {
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.NOT_FOUND,
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
-                e.getMessage()
-        );
+                e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
@@ -41,8 +39,7 @@ public class CommonExceptionHandler {
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.NOT_FOUND,
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
-                "Incorrect request url"
-        );
+                "Incorrect request url");
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
@@ -52,8 +49,7 @@ public class CommonExceptionHandler {
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.UNPROCESSABLE_ENTITY,
                 HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase(),
-                e.getMessage()
-        );
+                e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
@@ -63,8 +59,7 @@ public class CommonExceptionHandler {
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.UNPROCESSABLE_ENTITY,
                 HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase(),
-                e.getMessage()
-        );
+                e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
