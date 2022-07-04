@@ -16,8 +16,6 @@ public interface PassportRepository {
 
     void save(Long id, PassportDto passportDto);
 
-    void update(Long id, PassportDto passportDto);
-
     Optional<PassportDto> findById(Long id);
 
     Set<PassportDto> findByStatus(List<PassportDto> passports, String status);

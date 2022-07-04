@@ -42,17 +42,14 @@ public class PersonApiControllerTest {
 
     @Test
     public void testPersonPost() {
-        String firstName = DataGenerator.getName("firstName");
-        String lastName = DataGenerator.getName("lastName");
-        LocalDate dateOfBirth = DataGenerator.getCurrentDate().minusYears(Long.parseLong(RandomStringUtils.randomNumeric(2)));
 
         Response response = createTestPerson();
 
         Assert.assertEquals(200, response.statusCode());
         Assert.assertNotNull("Id should be not null", response.jsonPath().getString("id"));
-        Assert.assertEquals(firstName, response.jsonPath().getString("firstName"));
-        Assert.assertEquals(lastName, response.jsonPath().getString("lastName"));
-        Assert.assertEquals(dateOfBirth.toString(), response.jsonPath().getString("dateOfBirth"));
+        Assert.assertNotNull("firstName should be not null", response.jsonPath().getString("firstName"));
+        Assert.assertNotNull("lastName should be not null", response.jsonPath().getString("lastName"));
+        Assert.assertNotNull("dateOfBirth should be not null", response.jsonPath().getString("dateOfBirth"));
         Assert.assertEquals("Russia", response.jsonPath().getString("birthCountry"));
     }
 
@@ -155,6 +152,25 @@ public class PersonApiControllerTest {
                 .extract().response();
 
         Assert.assertEquals(422, errorResponse.statusCode());
+    }
+
+    @Test
+    public void testPassportDeactivate() {
+        String id = createTestPerson().jsonPath().getString("id");
+        Response createResponse = PassportApiControllerTest.createTestPassport(id, PassportType.CITIZEN, Status.ACTIVE);
+
+        Assert.assertEquals(200, createResponse.statusCode());
+        Assert.assertEquals("active", createResponse.jsonPath().getString("status"));
+
+        Response errorResponse = given()
+                .header("Accept", "application/json")
+                .header("Content-type", "application/json")
+                .when()
+                .put("/passports/" + id + "/deactivate")
+                .then()
+                .extract().response();
+
+        Assert.assertEquals(200, errorResponse.statusCode());
     }
 
 }

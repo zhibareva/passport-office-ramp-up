@@ -2,6 +2,7 @@ package com.passportoffice.exception.handler;
 
 import com.passportoffice.dto.response.ErrorResponse;
 import com.passportoffice.exception.InvalidPassportTypeException;
+import com.passportoffice.exception.PassportNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -21,6 +22,16 @@ public class CommonExceptionHandler {
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PassportNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<ErrorResponse> handlePassportNotFound(Exception e) {
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(NullPointerException.class)

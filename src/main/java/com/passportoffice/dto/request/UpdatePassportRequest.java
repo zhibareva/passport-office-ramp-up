@@ -2,6 +2,8 @@ package com.passportoffice.dto.request;
 
 import com.passportoffice.model.PassportType;
 import com.passportoffice.model.Status;
+import validation.ElementOfEnum;
+import validation.ElementOfSubset;
 import validation.PassportNumber;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,30 +15,31 @@ import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 
-@Validated
+
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class UpdatePassportRequest {
 
   @NonNull
-  private PassportType type;
+  private final PassportType type;
 
   @NonNull
   @PassportNumber
-  private Long number;
+  private final Long number;
 
   @NonNull
   @PastOrPresent
-  private LocalDate givenDate;
+  private final LocalDate givenDate;
 
+  @NonNull
   @FutureOrPresent
-  private LocalDate expirationDate;
+  private final LocalDate expirationDate;
 
   @NonNull
-  private String departmentCode;
+  private final String departmentCode;
 
   @NonNull
-  private Status status;
+  @ElementOfSubset(anyOf = {Status.INACTIVE, Status.LOST})
+  private final Status status;
 
 }

@@ -9,7 +9,7 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-@Validated
+
 @Data
 @AllArgsConstructor
 public class CreatePersonRequest {

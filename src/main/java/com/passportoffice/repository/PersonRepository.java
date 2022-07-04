@@ -16,6 +16,4 @@ public interface PersonRepository {
     Optional<PersonDto> deleteById(Long id);
 
     void save(Long id, PersonDto passportDto);
-
-    void update(Long id, PersonDto passportDto);
 }

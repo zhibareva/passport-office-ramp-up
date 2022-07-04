@@ -1,6 +1,7 @@
 package com.passportoffice.service.impl;
 
 import com.passportoffice.dto.PersonDto;
+import com.passportoffice.exception.PersonNotFoundException;
 import com.passportoffice.repository.PersonRepository;
 import com.passportoffice.service.PersonService;
 import lombok.AllArgsConstructor;
@@ -19,7 +20,7 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public PersonDto getPerson(Long id) {
         log.info("Searching for person with id [{}]", id);
-        return personRepository.findById(id).orElse(new PersonDto());
+        return personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException("There is no person with such id"));
     }
 
     @Override
@@ -34,7 +35,7 @@ public class PersonServiceImpl implements PersonService {
                                   String birthCountry) {
         PersonDto personDto = new PersonDto(id, firstName, lastName, dateOfBirth, birthCountry);
         log.info("Updating for person with id [{}] with data [{}]", id, personDto);
-        personRepository.update(id, personDto);
+        personRepository.save(id, personDto);
         return getPerson(id);
     }
 

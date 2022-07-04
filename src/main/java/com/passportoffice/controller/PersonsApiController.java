@@ -7,18 +7,20 @@ import com.passportoffice.dto.request.UpdatePassportRequest;
 import com.passportoffice.dto.request.UpdatePersonRequest;
 import com.passportoffice.dto.response.PassportResponse;
 import com.passportoffice.dto.response.PersonResponse;
-import com.passportoffice.mapper.PassportEntitiesMapper;
-import com.passportoffice.mapper.PersonEntitiesMapper;
+import com.passportoffice.exception.PassportNotFoundException;
 import com.passportoffice.model.Status;
 import com.passportoffice.repository.PassportRepository;
 import com.passportoffice.repository.PersonRepository;
 import com.passportoffice.service.OfficeService;
 import com.passportoffice.service.PassportService;
 import com.passportoffice.service.PersonService;
-import com.passportoffice.utils.DataGenerator;
+import com.passportoffice.utils.mapper.PassportEntitiesMapper;
+import com.passportoffice.utils.mapper.PersonEntitiesMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import validation.ElementOfEnum;
 import validation.validator.PassportTypeValidator;
 
 import javax.validation.Valid;
@@ -40,16 +42,17 @@ public class PersonsApiController {
     private final PersonRepository personRepository;
     private final PassportRepository passportRepository;
 
-    @RequestMapping(value = "/persons/{id}/passports", produces = { "application/json" }, consumes = { "application/json" }, method = RequestMethod.POST)
+    @RequestMapping(value = "/persons/{id}/passports", produces = {"application/json"}, consumes = {"application/json"}, method = RequestMethod.POST)
     public PassportResponse addPassport(@PathVariable("id") Long personId,
-                                        @Valid @RequestBody CreatePassportRequest body) {
+                                        @Valid @RequestBody CreatePassportRequest body) throws
+            PassportNotFoundException {
 
         validator.validatePassportType(personId, body.getType());
         Long passportId = passportRepository.generateId();
 
-        PassportDto passportDto = officeService.createPassport(
-                passportId,
+        @Valid PassportDto passportDto = officeService.createPassport(
                 personId,
+                passportId,
                 body.getType(),
                 body.getNumber(),
                 body.getGivenDate(),
@@ -60,11 +63,11 @@ public class PersonsApiController {
         return passportEntitiesMapper.toResponse(passportDto);
     }
 
-    @RequestMapping(value = "/persons", produces = { "application/json" }, consumes = { "*/*" }, method = RequestMethod.POST)
+    @RequestMapping(value = "/persons", produces = {"application/json"}, consumes = {"*/*"}, method = RequestMethod.POST)
     public PersonResponse createPerson(@Valid @RequestBody CreatePersonRequest body) {
         Long personId = personRepository.generateId();
         log.info("Request to create person entity with body [{}]", body);
-        return personEntitiesMapper.toResponse(
+        PersonResponse personResponse = personEntitiesMapper.toResponse(
                 personService.createPerson(
                         personId,
                         body.getFirstName(),
@@ -72,18 +75,28 @@ public class PersonsApiController {
                         body.getDateOfBirth(),
                         body.getBirthCountry()
                 ));
+        log.info("Created person [{}]", personResponse);
+        return personResponse;
 
     }
-    @RequestMapping(value = "/persons/{id}", produces = { "application/json" }, method = RequestMethod.DELETE)
+
+    @RequestMapping(value = "/persons/{id}", produces = {"application/json"}, method = RequestMethod.DELETE)
     public PersonResponse deletePerson(@PathVariable("id") Long id) {
         return personEntitiesMapper.toResponse(personService.deletePerson(id));
     }
 
-    @RequestMapping(value = "/persons/{id}/passports", produces = { "application/json" }, method = RequestMethod.GET)
+    @RequestMapping(value = "/persons/{id}/passports", produces = {"application/json"}, method = RequestMethod.GET)
     public List<PassportResponse> getPassportsByFilter(@PathVariable("id") Long id,
-                                                       @Valid @RequestParam(value = "status", required = false) String status,
-                                                       @Valid @RequestParam(value = "startDate", required = false) LocalDate startDate,
-                                                       @Valid @RequestParam(value = "endDate", required = false) LocalDate endDate) {
+                                                       @Valid @RequestParam(value = "status", required = false)
+                                                       @ElementOfEnum(enumClass = Status.class)
+                                                               String status,
+                                                       @Valid @RequestParam(value = "startDate", required = false)
+                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                               LocalDate startDate,
+                                                       @Valid @RequestParam(value = "endDate", required = false)
+                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                               LocalDate endDate) throws
+            PassportNotFoundException {
 
         List<PassportDto> filteredPassports = officeService.getPassportPerPerson(id);
         log.info("Passports of person [{}]", filteredPassports);
@@ -100,7 +113,7 @@ public class PersonsApiController {
 
     }
 
-    @RequestMapping(value = "/persons", produces = { "application/json" }, method = RequestMethod.GET)
+    @RequestMapping(value = "/persons", produces = {"application/json"}, method = RequestMethod.GET)
     public List<PersonResponse> getPersonsByFilter(
             @Valid @RequestParam(value = "passportNumber", required = false) Long passportNumber) {
 
@@ -110,12 +123,12 @@ public class PersonsApiController {
         return personResponses;
     }
 
-    @RequestMapping(value = "/persons/{id}", produces = { "application/json" }, method = RequestMethod.GET)
+    @RequestMapping(value = "/persons/{id}", produces = {"application/json"}, method = RequestMethod.GET)
     public PersonResponse getPersonsById(@PathVariable("id") Long id) {
         return personEntitiesMapper.toResponse(personService.getPerson(id));
     }
 
-    @RequestMapping(value = "/persons/{personId}/passports/{passportId}", produces = { "application/json" }, consumes = { "*/*" }, method = RequestMethod.PUT)
+    @RequestMapping(value = "/persons/{personId}/passports/{passportId}", produces = {"application/json"}, consumes = {"*/*"}, method = RequestMethod.PUT)
     public PassportResponse updatePassportPerPerson(@PathVariable("personId") Long personId,
                                                     @PathVariable("passportId") Long passportId,
                                                     @Valid @RequestBody UpdatePassportRequest body) {
@@ -124,22 +137,10 @@ public class PersonsApiController {
 
         PassportDto updatedPassport = passportService.getPassportById(passportId);
 
-        if (updatedPassport.getStatus().equals(Status.LOST))
-            return addPassport(
-                    personId,
-                    new CreatePassportRequest(
-                            updatedPassport.getType(),
-                            DataGenerator.generatePassportNumber(),
-                            DataGenerator.getCurrentDate().plusDays(3),
-                            updatedPassport.getDepartmentCode(),
-                            Status.ACTIVE
-                    )
-            );
-        else
-            return passportEntitiesMapper.toResponse(updatedPassport);
+        return passportEntitiesMapper.toResponse(updatedPassport);
     }
 
-    @RequestMapping(value = "/persons/{id}", produces = { "application/json" }, consumes = { "*/*" }, method = RequestMethod.PUT)
+    @RequestMapping(value = "/persons/{id}", produces = {"application/json"}, consumes = {"*/*"}, method = RequestMethod.PUT)
     public PersonResponse updatePerson(@PathVariable("id") Long personId,
                                        @Valid @RequestBody UpdatePersonRequest body) {
         return personEntitiesMapper.toResponse(

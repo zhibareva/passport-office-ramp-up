@@ -1,5 +1,6 @@
 package com.passportoffice.service.impl;
 
+import com.passportoffice.controller.PassportsApiController;
 import com.passportoffice.dto.request.UpdatePassportRequest;
 import com.passportoffice.dto.PassportDto;
 import com.passportoffice.dto.PersonDto;
@@ -9,12 +10,12 @@ import com.passportoffice.model.Status;
 import com.passportoffice.repository.OfficeRepository;
 import com.passportoffice.repository.PassportRepository;
 import com.passportoffice.service.OfficeService;
+import com.passportoffice.utils.DataGenerator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +31,7 @@ public class OfficeServiceImpl implements OfficeService {
     public PassportDto createPassport(Long personId, Long passportId, PassportType type, Long number,
                                       LocalDate givenDate,
                                       String depCode, Status status) {
+
         PassportDto passportDto = new PassportDto(
                 passportId, personId, type, number, givenDate, givenDate.plusYears(type.getValidity()), depCode,
                 status
@@ -40,34 +42,69 @@ public class OfficeServiceImpl implements OfficeService {
     }
 
     @Override
-    public List<PassportDto> getPassportPerPerson(Long personId) {
+    public List<PassportDto> getPassportPerPerson(Long personId) throws PassportNotFoundException {
         log.info("Searching for passport by person id [{}]", personId);
-        return officeRepository.findById(personId).orElseThrow(() -> new PassportNotFoundException("There are no passports"));
+
+        return officeRepository.findById(personId).orElseThrow(
+                () -> new PassportNotFoundException("There are no passports"));
     }
 
     @Override
     public List<PersonDto> getPersonsByFilter(Long passportNumber) {
         log.info("Searching for person by passport number [{}]", passportNumber);
-        return officeRepository.findByFilter(passportNumber).orElseThrow(
-                () -> new NullPointerException("There are no persons with passport number " + passportNumber));
+        return officeRepository.findByFilter(passportNumber).filter(List::isEmpty).orElseThrow(
+                () -> new IllegalStateException("There are no persons with passport number " + passportNumber));
     }
 
     @Override
     public void updatePassportPerPerson(Long personId, Long passportId, UpdatePassportRequest body) {
         log.info("Updating passport [{}] with data [{}] for person with id [{}]", passportId, personId, body);
 
-        passportRepository.update(passportId, new PassportDto(
-                passportId,
-                personId,
-                body.getType(),
-                body.getNumber(),
-                body.getGivenDate(),
-                body.getExpirationDate(),
-                body.getDepartmentCode(),
-                body.getStatus()
-        ));
+        if (body.getStatus().equals(Status.LOST)) {
+            deactivatePassport(passportId);
+        } else {
+            passportRepository.save(passportId, new PassportDto(
+                    passportId,
+                    personId,
+                    body.getType(),
+                    body.getNumber(),
+                    body.getGivenDate(),
+                    body.getExpirationDate(),
+                    body.getDepartmentCode(),
+                    body.getStatus()
+            ));
+        }
 
-        passportRepository.findById(passportId).orElse(new PassportDto());
+        PassportDto updatedPassport = passportRepository.findById(passportId).orElseThrow(() -> new RuntimeException());
+
+    }
+
+    @Override
+    public PassportDto deactivatePassport(Long passportId) {
+        log.info("deactivate passport [{}]", passportId);
+        PassportDto passportDto = passportRepository.findById(passportId).orElseThrow(RuntimeException::new);
+        log.info("Updated passport [{}]", passportDto);
+        passportRepository.save(passportId, new PassportDto(
+                passportDto.getPassportId(),
+                passportDto.getPersonId(),
+                passportDto.getType(),
+                passportDto.getNumber(),
+                passportDto.getGivenDate(),
+                passportDto.getExpirationDate(),
+                passportDto.getDepartmentCode(),
+                Status.LOST
+        ));
+        Long newId = passportRepository.generateId();
+        createPassport(
+                passportDto.getPersonId(),
+                newId,
+                passportDto.getType(),
+                DataGenerator.generatePassportNumber(),
+                DataGenerator.getCurrentDate().plusDays(3),
+                passportDto.getDepartmentCode(),
+                Status.ACTIVE
+        );
+        return passportRepository.findById(passportId).orElseThrow(RuntimeException::new);
     }
 
     @Override

@@ -38,11 +38,4 @@ public class PersonRepositoryImpl implements PersonRepository {
         persons.put(id, passportDto);
     }
 
-    @Override
-    public void update(Long id, PersonDto passportDto) {
-        persons.replace(id, passportDto);
-    }
-
-
-
 }

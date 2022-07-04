@@ -37,15 +37,10 @@ public class PassportRepositoryImpl implements PassportRepository {
     }
 
     @Override
-    public void update(Long id, PassportDto passportDto) {
-        passports.replace(id, passportDto);
-    }
-    
-    @Override
     public Optional<PassportDto> findById(Long id) {
         return Optional.of(passports.get(id));
     }
-    
+
     @Override
     public Set<PassportDto> findByStatus(List<PassportDto> passports, String status) {
         return passports.stream().filter(
@@ -68,19 +63,20 @@ public class PassportRepositoryImpl implements PassportRepository {
     }
 
     @Override
-    public Set<PassportDto> findByFilter(List<PassportDto> passportDtos, LocalDate startDate, LocalDate endDate, String status) {
+    public Set<PassportDto> findByFilter(List<PassportDto> passportDtos, LocalDate startDate, LocalDate endDate,
+                                         String status) {
         Set<PassportDto> filteredPassports = new HashSet<>();
         if (startDate != null) {
             filteredPassports.addAll(findByStartDate(passportDtos, startDate));
-            log.info("startDate [{}]", filteredPassports);
+            log.info("Passports after filtering by start date [{}]", filteredPassports);
         }
         if (endDate != null) {
             filteredPassports.addAll(findByEndDate(passportDtos, endDate));
-            log.info("endDate [{}]", filteredPassports);
+            log.info("Passports after filtering by end date [{}]", filteredPassports);
         }
         if (status != null) {
             filteredPassports.addAll(findByStatus(passportDtos, status));
-            log.info("status [{}]", filteredPassports);
+            log.info("Passports after filtering by status [{}]", filteredPassports);
         }
 
         return filteredPassports;
