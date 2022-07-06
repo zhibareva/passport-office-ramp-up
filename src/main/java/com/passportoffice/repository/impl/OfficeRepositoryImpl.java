@@ -1,57 +1,44 @@
 package com.passportoffice.repository.impl;
 
-import com.passportoffice.dto.response.PassportDto;
-import com.passportoffice.dto.response.PersonDto;
+import com.passportoffice.dto.PassportDto;
+import com.passportoffice.dto.PersonDto;
+import com.passportoffice.dto.response.PersonResponse;
 import com.passportoffice.repository.OfficeRepository;
+import com.passportoffice.repository.PassportRepository;
+import com.passportoffice.repository.PersonRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
+@AllArgsConstructor
 public class OfficeRepositoryImpl implements OfficeRepository {
 
-    private final Map<PersonDto, Map<Long, PassportDto>> officeRepo = new HashMap<>();
+    private final PassportRepository passportRepository;
+    private final PersonRepository personRepository;
 
     @Override
-    public void save(Long personId, PassportDto passportDto) {
-        for (Map.Entry<PersonDto, Map<Long, PassportDto>> passportsPerPerson : officeRepo.entrySet()) {
-            if (passportsPerPerson.getKey().getId().equals(personId)) {
-                passportsPerPerson.getValue().put(passportDto.getId(), passportDto);
-            }
-        }
-    }
-
-    @Override
-    public Optional<List<PassportDto>> findById(String personId) {
-        List<PassportDto> passportDtos = new ArrayList<>();
-        for (Map.Entry<PersonDto, Map<Long, PassportDto>> passportsPerPerson : officeRepo.entrySet()) {
-            if (passportsPerPerson.getKey().getId().equals(Long.parseLong(personId))) {
-                passportDtos = new ArrayList<>(passportsPerPerson.getValue().values());
-            }
-        }
-        return Optional.of(passportDtos);
+    public Optional<List<PassportDto>> findById(Long personId) {
+        return Optional.of(passportRepository.getPassports().values()
+                                   .stream()
+                                   .filter(
+                                           passportDto -> passportDto.getPersonId().equals(personId))
+                                   .collect(Collectors.toList()));
     }
 
     @Override
     public Optional<List<PersonDto>> findByFilter(Long passportNumber) {
+        List<PassportDto> passports = passportRepository.getPassports().values()
+                .stream()
+                .filter(
+                        passportDto -> passportDto.getNumber().equals(passportNumber))
+                .collect(Collectors.toList());
         List<PersonDto> persons = new ArrayList<>();
-        for (Map.Entry<PersonDto, Map<Long, PassportDto>> passportsPerPerson : officeRepo.entrySet()) {
-            for (Map.Entry<Long, PassportDto> passports : passportsPerPerson.getValue().entrySet()) {
-                if (passports.getValue().getNumber().equals(passportNumber)) {
-                    persons.add(passportsPerPerson.getKey());
-                }
-            }
-        }
+        passports.forEach(passportDto -> persons.add(personRepository.getPersons().get(passportDto.getPersonId())));
         return Optional.of(persons);
     }
 
-    @Override
-    public void update(Long personId, Long passportId, PassportDto updatedPassport) {
 
-        for (Map.Entry<PersonDto, Map<Long, PassportDto>> passportsPerPerson : officeRepo.entrySet()) {
-            if (passportsPerPerson.getKey().getId().equals(personId)) {
-                passportsPerPerson.getValue().replace(passportId, updatedPassport);
-            }
-        }
-    }
 }

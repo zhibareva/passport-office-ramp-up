@@ -1,6 +1,6 @@
-package com.passportoffice.validation;
+package validation;
 
-import com.passportoffice.validation.validator.PassportNumberValidator;
+import validation.validator.PassportNumberValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

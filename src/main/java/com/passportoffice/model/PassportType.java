@@ -1,4 +1,4 @@
-package com.passportoffice.enums;
+package com.passportoffice.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

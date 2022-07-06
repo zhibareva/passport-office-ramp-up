@@ -1,11 +1,14 @@
 package com.passportoffice.utils;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
 @Component
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DataGenerator {
 
     public static Long generatePassportNumber() {

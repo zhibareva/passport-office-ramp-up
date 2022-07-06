@@ -1,8 +1,10 @@
 package com.passportoffice.dto.request;
 
-import com.passportoffice.enums.PassportType;
-import com.passportoffice.enums.Status;
-import com.passportoffice.validation.PassportNumber;
+import com.passportoffice.model.PassportType;
+import com.passportoffice.model.Status;
+import validation.ElementOfSubset;
+import validation.ElementOfEnum;
+import validation.PassportNumber;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -11,26 +13,27 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 
-@Validated
+
 @Data
 @AllArgsConstructor
 public class CreatePassportRequest {
 
     @NonNull
-    private PassportType type;
+    private final PassportType type;
 
-    @PassportNumber
     @NonNull
-    private Long number;
+    @PassportNumber
+    private final Long number;
 
     @NonNull
     @PastOrPresent
-    private LocalDate givenDate;
+    private final LocalDate givenDate;
 
     @NonNull
-    private String departmentCode;
+    private final String departmentCode;
 
     @NonNull
-    private Status status;
+    @ElementOfSubset(anyOf = {Status.ACTIVE})
+    private final Status status;
 
 }

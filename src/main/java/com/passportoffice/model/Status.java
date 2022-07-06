@@ -1,4 +1,4 @@
-package com.passportoffice.enums;
+package com.passportoffice.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -23,9 +23,9 @@ public enum Status {
     }
 
     @JsonCreator
-    public static Status fromValue(String text) {
+    public static Status fromValue(String value) {
         for (Status b : Status.values()) {
-            if (String.valueOf(b.value).equals(text)) {
+            if (String.valueOf(b.value).equals(value)) {
                 return b;
             }
         }

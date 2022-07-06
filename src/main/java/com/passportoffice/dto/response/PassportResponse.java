@@ -1,7 +1,7 @@
 package com.passportoffice.dto.response;
 
-import com.passportoffice.enums.PassportType;
-import com.passportoffice.enums.Status;
+import com.passportoffice.model.PassportType;
+import com.passportoffice.model.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,32 +13,31 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 
-@Validated
+
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class PassportDto {
+public class PassportResponse {
 
     @NotNull
     @Min(value = 1)
-    private Long id = 123L;
+    private final Long id;
 
     @NotNull
-    private PassportType type;
+    private final PassportType type;
 
     @NotNull
-    private Long number;
+    private final Long number;
 
     @PastOrPresent
-    private LocalDate givenDate;
+    private final LocalDate givenDate;
 
     @FutureOrPresent
-    private LocalDate expirationDate;
+    private final LocalDate expirationDate;
 
     @NotNull
-    private String departmentCode;
+    private final String departmentCode;
 
     @NotNull
-    private Status status;
+    private final Status status;
 
 }

@@ -11,28 +11,27 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-@Validated
+
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class PersonDto {
+public class PersonResponse {
 
     @NotNull
-    private Long id = 123L;
+    private final Long id;
 
     @NotEmpty
     @Pattern(regexp = "^[a-zA-Z\\s]+$")
-    private String firstName;
+    private final String firstName;
 
     @NotEmpty
     @Pattern(regexp = "^[a-zA-Z\\s]+$")
-    private String lastName;
+    private final String lastName;
 
     @Past
-    private LocalDate dateOfBirth;
+    private final LocalDate dateOfBirth;
 
     @NotEmpty
     @Pattern(regexp = "^[a-zA-Z\\s]+$")
-    private String birthCountry;
+    private final String birthCountry;
 
 }
