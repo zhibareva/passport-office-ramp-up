@@ -2,16 +2,15 @@ package com.passportoffice.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
-
+import lombok.NonNull;
 
 @Data
 @AllArgsConstructor
 public class ErrorResponse {
 
-    private final HttpStatus status;
-    private final String error;
-    private final String message;
+  @NonNull private final int status;
 
+  @NonNull private final String error;
+
+  @NonNull private final String message;
 }

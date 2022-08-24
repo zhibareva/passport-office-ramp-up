@@ -1,37 +1,34 @@
 package com.passportoffice.dto.response;
 
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.validation.annotation.Validated;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.Pattern;
-import java.time.LocalDate;
+import lombok.NonNull;
 
 
 @Data
 @AllArgsConstructor
 public class PersonResponse {
 
-    @NotNull
-    private final Long id;
+  @NonNull private final String id;
 
-    @NotEmpty
-    @Pattern(regexp = "^[a-zA-Z\\s]+$")
-    private final String firstName;
+  @NonNull private final String firstName;
 
-    @NotEmpty
-    @Pattern(regexp = "^[a-zA-Z\\s]+$")
-    private final String lastName;
+  @NonNull private final String lastName;
 
-    @Past
-    private final LocalDate dateOfBirth;
+  @NonNull private final LocalDate dateOfBirth;
 
-    @NotEmpty
-    @Pattern(regexp = "^[a-zA-Z\\s]+$")
-    private final String birthCountry;
+  @NonNull private final String birthCountry;
+
+    @Override
+    public String toString() {
+        return "\nPersonResponse{" +
+            "\n\tid='" + id + '\'' +
+            ", \n\tfirstName='" + firstName + '\'' +
+            ", \n\tlastName='" + lastName + '\'' +
+            ", \n\tdateOfBirth=" + dateOfBirth +
+            ", \n\tbirthCountry='" + birthCountry + '\'' +
+            '}';
+    }
 
 }
