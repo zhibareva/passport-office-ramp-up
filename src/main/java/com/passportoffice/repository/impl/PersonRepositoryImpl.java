@@ -1,41 +1,35 @@
 package com.passportoffice.repository.impl;
 
-import com.passportoffice.dto.PersonDto;
+import com.passportoffice.model.Person;
 import com.passportoffice.repository.PersonRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class PersonRepositoryImpl implements PersonRepository {
 
-    private final Map<Long, PersonDto> persons = new HashMap<>();
+  private final Map<String, Person> persons = new HashMap<>();
 
-    @Override
-    public Long generateId() {
-        return getPersons().size() + 1L;
-    }
+  public Map<String, Person> getPersons() {
+    return Collections.unmodifiableMap(persons);
+  }
 
-    public Map<Long, PersonDto> getPersons() {
-        return Collections.unmodifiableMap(persons);
-    }
+  @Override
+  public Optional<Person> findById(String id) {
+    return Optional.ofNullable(persons.get(id));
+  }
 
-    @Override
-    public Optional<PersonDto> findById(Long id) {
-        return Optional.of(persons.get(id));
-    }
+  @Override
+  public Optional<Person> deleteById(String id) {
+    return Optional.of(persons.remove(id));
+  }
 
-    @Override
-    public Optional<PersonDto> deleteById(Long id) {
-        return Optional.of(persons.remove(id));
-    }
-
-    @Override
-    public void save(Long id, PersonDto passportDto) {
-        persons.put(id, passportDto);
-    }
-
+  @Override
+  public Person save(String id, Person passportDto) {
+    persons.put(id, passportDto);
+    return passportDto;
+  }
 }

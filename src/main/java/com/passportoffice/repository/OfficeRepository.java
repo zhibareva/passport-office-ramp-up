@@ -1,14 +1,12 @@
 package com.passportoffice.repository;
 
-import com.passportoffice.dto.PassportDto;
-import com.passportoffice.dto.PersonDto;
-
+import com.passportoffice.model.Passport;
+import com.passportoffice.model.Person;
 import java.util.List;
-import java.util.Optional;
 
 public interface OfficeRepository {
 
-    Optional<List<PassportDto>> findById(Long personId);
+  List<Passport> findById(String personId);
 
-    Optional<List<PersonDto>> findByFilter(Long passportNumber);
+  List<Person> findByFilter(Long passportNumber);
 }

@@ -1,19 +1,16 @@
 package com.passportoffice.repository;
 
-import com.passportoffice.dto.PersonDto;
-
+import com.passportoffice.model.Person;
 import java.util.Map;
 import java.util.Optional;
 
 public interface PersonRepository {
 
-    Long generateId();
+  Map<String, Person> getPersons();
 
-    Map<Long, PersonDto> getPersons();
+  Optional<Person> findById(String id);
 
-    Optional<PersonDto> findById(Long id);
+  Optional<Person> deleteById(String id);
 
-    Optional<PersonDto> deleteById(Long id);
-
-    void save(Long id, PersonDto passportDto);
+  Person save(String id, Person passportDto);
 }
