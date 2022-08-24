@@ -2,44 +2,32 @@ package com.passportoffice.dto.request;
 
 import com.passportoffice.model.PassportType;
 import com.passportoffice.model.Status;
-import validation.ElementOfEnum;
-import validation.ElementOfSubset;
-import validation.PassportNumber;
+import com.passportoffice.validation.PassportNumber;
+import com.passportoffice.validation.PassportStatus;
+import java.time.LocalDate;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import org.springframework.validation.annotation.Validated;
-
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.PastOrPresent;
-import java.time.LocalDate;
-
 
 @Data
 @AllArgsConstructor
 public class UpdatePassportRequest {
 
-  @NonNull
-  private final PassportType type;
+  @NotNull private final PassportType type;
 
-  @NonNull
-  @PassportNumber
-  private final Long number;
+  @NotNull @PassportNumber private final Long number;
 
-  @NonNull
-  @PastOrPresent
-  private final LocalDate givenDate;
+  @NotNull @PastOrPresent private final LocalDate givenDate;
 
-  @NonNull
-  @FutureOrPresent
-  private final LocalDate expirationDate;
+  @NotNull @FutureOrPresent private final LocalDate expirationDate;
 
-  @NonNull
-  private final String departmentCode;
+  @NotNull private final String departmentCode;
 
-  @NonNull
-  @ElementOfSubset(anyOf = {Status.INACTIVE, Status.LOST})
+  @NotNull
+  @PassportStatus(
+      anyOf = {Status.INACTIVE, Status.LOST},
+      enumClass = Status.class)
   private final Status status;
-
 }
