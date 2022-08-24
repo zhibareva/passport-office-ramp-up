@@ -1,3 +1,7 @@
-## IntelliJ files
+.project
+.classpath
+.settings/
+.repository/
+target/
 .idea
 *.iml
