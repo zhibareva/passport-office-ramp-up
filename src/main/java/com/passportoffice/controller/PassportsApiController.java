@@ -1,39 +1,48 @@
 package com.passportoffice.controller;
 
+import com.passportoffice.controller.mapper.PassportEntitiesMapper;
 import com.passportoffice.dto.response.PassportResponse;
+import com.passportoffice.exception.PassportNotFoundException;
 import com.passportoffice.service.OfficeService;
-import com.passportoffice.utils.mapper.PassportEntitiesMapper;
-import com.passportoffice.service.impl.PassportServiceImpl;
+import com.passportoffice.service.PassportService;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
 
 @RestController
 @AllArgsConstructor
 @Slf4j
 public class PassportsApiController {
 
-    private final PassportServiceImpl passportService;
-    private final OfficeService officeService;
-    private final PassportEntitiesMapper mapper;
+  private final PassportService passportService;
+  private final OfficeService officeService;
+  private final PassportEntitiesMapper mapper;
 
-    @RequestMapping(value = "/passports/{id}", produces = {"application/json"}, method = RequestMethod.DELETE)
-    public PassportResponse deletePassport(@Valid @PathVariable("id") Long id) {
-        return mapper.toResponse(passportService.deletePassportById(id));
-    }
+  @SneakyThrows
+  @DeleteMapping(path = "/passports/{id}")
+  @ResponseStatus(code = HttpStatus.NO_CONTENT)
+  public PassportResponse deletePassport(@PathVariable("id") String id) {
+    return mapper.toResponse(passportService.deletePassportById(id));
+  }
 
-    @RequestMapping(value = "/passports/{id}", produces = {"application/json"}, method = RequestMethod.GET)
-    public PassportResponse getPassportById(@Valid @PathVariable("id") Long id) {
-        return mapper.toResponse(passportService.getPassportById(id));
-    }
+  @SneakyThrows
+  @GetMapping(path = "/passports/{id}")
+  @ResponseStatus(code = HttpStatus.OK)
+  public PassportResponse getPassportById(@PathVariable("id") String id) {
+    return mapper.toResponse(passportService.getPassportById(id));
+  }
 
-    @RequestMapping(value = "/passports/{id}/deactivate", produces = {"application/json"}, method = RequestMethod.PUT)
-    public PassportResponse deactivatePassport(@Valid @PathVariable("id") Long id) {
-        return mapper.toResponse(officeService.deactivatePassport(id));
-    }
+  @PostMapping(path = "/passports/{id}/deactivate")
+  @ResponseStatus(code = HttpStatus.OK)
+  public PassportResponse deactivatePassport(@PathVariable("id") String id)
+      throws PassportNotFoundException {
+    return mapper.toResponse(officeService.deactivatePassport(id));
+  }
 }
