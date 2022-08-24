@@ -1,14 +1,17 @@
 package com.passportoffice.model;
 
-import lombok.AllArgsConstructor;
-
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @AllArgsConstructor
 public class Person {
-    private final Long id;
-    private final String firstName;
-    private final String lastName;
-    private final LocalDate dateOfBirth;
-    private final String birthCountry;
+  private final String id;
+  private final String firstName;
+  private final String lastName;
+  private final LocalDate dateOfBirth;
+  private final String birthCountry;
 }

@@ -1,19 +1,17 @@
 package com.passportoffice.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @AllArgsConstructor
 public class Passport {
 
-    private final Long passportId;
-    private final Long personId;
+    private final String passportId;
+    private final String personId;
     private final PassportType type;
     private final Long number;
     private final LocalDate givenDate;
@@ -21,4 +19,17 @@ public class Passport {
     private final String departmentCode;
     private final Status status;
 
+    @Override
+    public String toString() {
+        return "\nPassport{" +
+            "\n\tpassportId='" + passportId + '\'' +
+            ", \n\tpersonId='" + personId + '\'' +
+            ", \n\ttype=" + type +
+            ", \n\tnumber=" + number +
+            ", \n\tgivenDate=" + givenDate +
+            ", \n\texpirationDate=" + expirationDate +
+            ", \n\tdepartmentCode='" + departmentCode + '\'' +
+            ", \n\tstatus=" + status +
+            '}';
+    }
 }
