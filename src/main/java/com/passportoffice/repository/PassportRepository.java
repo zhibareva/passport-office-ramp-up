@@ -22,7 +22,11 @@ public interface PassportRepository {
   Set<Passport> findByEndDate(Set<Passport> passports, LocalDate endDate);
 
   Set<Passport> findByFilter(
-      List<Passport> filteredPassports, LocalDate startDate, LocalDate endDate, String status);
+      List<Passport> filteredPassports, LocalDate startDate,LocalDate endDate, String status);
 
   Map<String, Passport> getPassports();
+
+  List<Passport> findByPersonId(String personId);
+
+  List<Passport> findByPassportNumber(Long passportNumber);
 }

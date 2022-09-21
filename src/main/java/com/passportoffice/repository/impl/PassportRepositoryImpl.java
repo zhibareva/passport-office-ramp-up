@@ -28,7 +28,7 @@ public class PassportRepositoryImpl implements PassportRepository {
 
   @Override
   public Optional<Passport> deleteById(String id) {
-    return Optional.of(passports.remove(id));
+    return Optional.ofNullable(passports.remove(id));
   }
 
   @Override
@@ -39,7 +39,7 @@ public class PassportRepositoryImpl implements PassportRepository {
 
   @Override
   public Optional<Passport> findById(String id) {
-    return Optional.of(passports.get(id));
+    return Optional.ofNullable(passports.get(id));
   }
 
   @Override
@@ -66,34 +66,51 @@ public class PassportRepositoryImpl implements PassportRepository {
   @Override
   public Set<Passport> findByFilter(
       List<Passport> passportDtos, LocalDate startDate, LocalDate endDate, String status) {
-    Set<Passport> filteredPassports = new HashSet<>(passportDtos);
+    Set<Passport> filteredPassports;
+    Set<Passport> buffer = new HashSet<>(passportDtos);
 
-    log.info("Passports before filtering");
-    filteredPassports.forEach(passport -> log.info("[{}]", passport.toString()));
+    log.trace("Passports before filtering");
+    buffer.forEach(passport -> log.trace("[{}]", passport.toString()));
 
     if (status != null) {
-      filteredPassports.addAll(findByStatus(filteredPassports, status));
-
-      log.info("Passports after filtering by status");
-      filteredPassports.forEach(passport -> log.info("[{}]", passport.toString()));
+      filteredPassports = new HashSet<>(findByStatus(buffer, status));
+      buffer = new HashSet<>(filteredPassports);
+      log.trace("Passports after filtering by status");
+      filteredPassports.forEach(passport -> log.trace("[{}]", passport.toString()));
     }
 
     if (startDate != null) {
-      filteredPassports.addAll(findByStartDate(filteredPassports, startDate));
-
-      log.info("Passports after filtering by start date");
-      filteredPassports.forEach(passport -> log.info("[{}]", passport.toString()));
+      filteredPassports = new HashSet<>(findByStartDate(buffer, startDate));
+      buffer = new HashSet<>(filteredPassports);
+      log.trace("Passports after filtering by start date");
+      filteredPassports.forEach(passport -> log.trace("[{}]", passport.toString()));
     }
 
     if (endDate != null) {
-      filteredPassports.addAll(findByEndDate(filteredPassports, endDate));
-
-      log.info("Passports after filtering by end date");
-      filteredPassports.forEach(passport -> log.info("[{}]", passport.toString()));
+      filteredPassports = new HashSet<>(findByEndDate(buffer, endDate));
+      buffer = new HashSet<>(filteredPassports);
+      log.trace("Passports after filtering by end date");
+      filteredPassports.forEach(passport -> log.trace("[{}]", passport.toString()));
     }
 
-    log.info("Passports after filtering");
-    filteredPassports.forEach(passport -> log.info("[{}]", passport.toString()));
+    filteredPassports = new HashSet<>(buffer);
+
+    log.trace("Passports after filtering");
+    filteredPassports.forEach(passport -> log.trace("[{}]", passport.toString()));
     return filteredPassports;
+  }
+
+  @Override
+  public List<Passport> findByPersonId(String personId) {
+    return getPassports().values().stream()
+        .filter(passportDto -> passportDto.getPersonId().equals(personId))
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<Passport> findByPassportNumber(Long passportNumber) {
+    return getPassports().values().stream()
+        .filter(passportDto -> passportDto.getNumber().equals(passportNumber))
+        .collect(Collectors.toList());
   }
 }
