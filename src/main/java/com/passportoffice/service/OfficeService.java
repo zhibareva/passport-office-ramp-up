@@ -1,18 +1,17 @@
 package com.passportoffice.service;
 
-import com.passportoffice.dto.PassportDto;
-import com.passportoffice.dto.PersonDto;
-import com.passportoffice.dto.request.UpdatePassportRequest;
 import com.passportoffice.exception.PassportNotFoundException;
-import com.passportoffice.model.PassportType;
+import com.passportoffice.model.Passport;
 import com.passportoffice.model.Status;
+import com.passportoffice.model.PassportType;
+import com.passportoffice.model.Person;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
 public interface OfficeService {
 
-  PassportDto createPassport(
+  Passport createPassport(
       String personId,
       PassportType type,
       Long number,
@@ -21,16 +20,15 @@ public interface OfficeService {
       Status status)
       throws PassportNotFoundException;
 
-  List<PassportDto> getPassportPerPerson(String personId) throws PassportNotFoundException;
+  List<Person> getPersonsByFilter(Long passportNumber);
 
-  List<PersonDto> getPersonsByFilter(Long passportNumber);
-
-  PassportDto updatePassportPerPerson(
-      String personId, String passportId, UpdatePassportRequest body)
+  Passport updatePassportPerPerson(
+      String personId, String passportId, PassportType type, Long number, LocalDate givenDate, LocalDate expirationDate, String departmentCode, Status status)
       throws PassportNotFoundException;
 
-  PassportDto deactivatePassport(String passportId) throws PassportNotFoundException;
+  Passport deactivatePassport(String passportId)
+      throws PassportNotFoundException;
 
-  Set<PassportDto> getPassportsByFilter(
+  Set<Passport> getPassportsByFilter(
       String personId, LocalDate startDate, LocalDate endDate, String status);
 }

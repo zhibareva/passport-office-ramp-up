@@ -1,30 +1,26 @@
 package com.passportoffice.service.impl;
 
-import com.devskiller.friendly_id.FriendlyId;
-import com.passportoffice.controller.mapper.PassportEntitiesMapper;
-import com.passportoffice.controller.mapper.PersonEntitiesMapper;
-import com.passportoffice.dto.PassportDto;
-import com.passportoffice.dto.PersonDto;
-import com.passportoffice.dto.request.UpdatePassportRequest;
-import com.passportoffice.exception.InvalidPassportTypeException;
+import com.passportoffice.exception.InvalidPassportException;
 import com.passportoffice.exception.PassportNotFoundException;
-import com.passportoffice.exception.PersonNotFoundException;
 import com.passportoffice.model.Passport;
+import com.passportoffice.model.Status;
 import com.passportoffice.model.PassportType;
 import com.passportoffice.model.Person;
-import com.passportoffice.model.Status;
-import com.passportoffice.repository.OfficeRepository;
 import com.passportoffice.repository.PassportRepository;
+import com.passportoffice.repository.PersonRepository;
 import com.passportoffice.service.OfficeService;
 import com.passportoffice.utils.DataGenerator;
-import com.passportoffice.validation.PassportStatus;
+import com.passportoffice.utils.IdGenerator;
+import com.passportoffice.utils.PassportNumberGenerator;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import javax.validation.constraints.FutureOrPresent;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,21 +30,23 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class OfficeServiceImpl implements OfficeService {
 
-  private final OfficeRepository officeRepository;
   private final PassportRepository passportRepository;
-  private final PassportEntitiesMapper passportEntitiesMapper;
-  private final PersonEntitiesMapper personEntitiesMapper;
+  private final PersonRepository personRepository;
+  private final IdGenerator idGenerator;
+  private final PassportNumberGenerator passportNumberGenerator;
+  private final DataGenerator dataGenerator;
 
   @Override
-  public PassportDto createPassport(
+  @NonNull
+  public Passport createPassport(
       String personId,
       PassportType type,
       Long number,
-      LocalDate givenDate,
+      @FutureOrPresent LocalDate givenDate,
       String depCode,
       Status status) {
-    validatePassportType(personId, type);
-    String passportId = FriendlyId.createFriendlyId();
+    validatePassport(personId, type, number);
+    String passportId = idGenerator.getId();
     Passport passportModel =
         new Passport(
             passportId,
@@ -60,118 +58,103 @@ public class OfficeServiceImpl implements OfficeService {
             depCode,
             status);
     log.debug("Creating passport [{}]", passportModel);
-    Passport passport = passportRepository.save(passportModel);
-    return passportEntitiesMapper.toDto(passport);
+    return passportRepository.save(passportModel);
   }
 
-  public void validatePassportType(String personId, PassportType passportType) {
-    Collection<Passport> passportDtos = officeRepository.findById(personId);
-    if (passportDtos.stream().anyMatch(passport -> passport.getType().equals(passportType))
-        && passportDtos.stream().anyMatch(passport -> passport.getStatus().equals(Status.ACTIVE))) {
+  public void validatePassport(String personId, PassportType passportType, Long number) {
+    Collection<Passport> passports = passportRepository.findByPersonId(personId);
+    Predicate<Passport> passportTypeEquals = passport -> passport.getType().equals(passportType);
+    Predicate<Passport> passportStatusEquals = passport -> passport.getStatus().equals(
+        Status.ACTIVE);
+    Predicate<Passport> passportNumber = passportDto -> passportDto.getNumber().equals(number);
 
-      throw new InvalidPassportTypeException("User cannot has two passports with the same type");
+    if (passports.stream().anyMatch(passportTypeEquals.and(passportStatusEquals))) {
+      throw new InvalidPassportException("User cannot has two passports with the same type");
+    }
+
+    if (passportRepository.getPassports().values().stream().anyMatch(passportNumber)) {
+      throw new InvalidPassportException("Passport with such number is already exists.");
     }
   }
 
-  @SneakyThrows
   @Override
-  public List<PassportDto> getPassportPerPerson(String personId) {
-    log.info("Searching for passport by person id [{}]", personId);
-
-    List<Passport> passports = officeRepository.findById(personId);
-    if (passports.isEmpty())
-      throw new PassportNotFoundException("There is no passports with such id");
-    List<PassportDto> passportDtos = new ArrayList<>();
-    passports.forEach(passport -> passportDtos.add(passportEntitiesMapper.toDto(passport)));
-    return passportDtos;
-  }
-
-  @Override
-  public List<PersonDto> getPersonsByFilter(Long passportNumber) {
+  public List<Person> getPersonsByFilter(Long passportNumber) {
     log.info("Searching for person by passport number [{}]", passportNumber);
-    List<Person> persons = officeRepository.findByFilter(passportNumber);
-    if (persons.isEmpty())
-      throw new PersonNotFoundException(
-          "There are no persons with passport number " + passportNumber);
-    List<PersonDto> personDtos = new ArrayList<>();
-    persons.forEach(person -> personDtos.add(personEntitiesMapper.toDto(person)));
-    return personDtos;
+    List<Passport> passports = passportRepository.findByPassportNumber(passportNumber);
+    List<Person> persons = new ArrayList<>();
+    passports.forEach(
+        passport -> persons.add(personRepository.getPersons().get(passport.getPersonId())));
+    return persons;
   }
 
   @SneakyThrows
   @Override
-  public PassportDto updatePassportPerPerson(
-      String personId, String passportId, UpdatePassportRequest body) {
-    log.info(
-        "Updating passport [{}] with data [{}] for person with id [{}]",
-        passportId,
-        personId,
-        body);
+  public Passport updatePassportPerPerson(
+      String personId,
+      String passportId,
+      PassportType type,
+      Long number,
+      LocalDate givenDate,
+      LocalDate expirationDate,
+      String departmentCode,
+      Status status) {
+    log.info("Updating passport [{}] for person with id [{}]", passportId, personId);
 
-    PassportDto passportDto;
-    if (body.getStatus().equals(Status.LOST)) {
-      passportDto = deactivatePassport(passportId);
+    if (status.equals(Status.LOST)) {
+      return deactivatePassport(passportId);
     } else {
-      Passport passport =
-          passportRepository.save(
-              new Passport(
-                  passportId,
-                  personId,
-                  body.getType(),
-                  body.getNumber(),
-                  body.getGivenDate(),
-                  body.getExpirationDate(),
-                  body.getDepartmentCode(),
-                  body.getStatus()));
-      passportDto = passportEntitiesMapper.toDto(passport);
-    }
 
-    return passportDto;
+      return passportRepository.save(
+          new Passport(
+              passportId,
+              personId,
+              type,
+              number,
+              givenDate,
+              expirationDate,
+              departmentCode,
+              status));
+    }
   }
 
   @Override
-  public PassportDto deactivatePassport(String passportId) {
+  public Passport deactivatePassport(String passportId) throws PassportNotFoundException {
     log.info("Deactivate passport with [{}]", passportId);
-    Passport passportDto =
-        passportRepository.findById(passportId).orElseThrow(RuntimeException::new);
-    log.info("Updated passport [{}]", passportDto);
+    Passport passport =
+        passportRepository
+            .findById(passportId)
+            .orElseThrow(() -> new PassportNotFoundException("There is no such passport"));
+    log.info("Updated passport [{}]", passport);
     passportRepository.save(
         new Passport(
-            passportDto.getPassportId(),
-            passportDto.getPersonId(),
-            passportDto.getType(),
-            passportDto.getNumber(),
-            passportDto.getGivenDate(),
-            passportDto.getExpirationDate(),
-            passportDto.getDepartmentCode(),
+            passport.getPassportId(),
+            passport.getPersonId(),
+            passport.getType(),
+            passport.getNumber(),
+            passport.getGivenDate(),
+            passport.getExpirationDate(),
+            passport.getDepartmentCode(),
             Status.LOST));
 
     return createPassport(
-        passportDto.getPersonId(),
-        passportDto.getType(),
-        DataGenerator.generatePassportNumber(),
-        DataGenerator.getCurrentDate().plusDays(3),
-        passportDto.getDepartmentCode(),
+        passport.getPersonId(),
+        passport.getType(),
+        passportNumberGenerator.getNumber(),
+        dataGenerator.getCurrentDate().plusDays(3),
+        passport.getDepartmentCode(),
         Status.ACTIVE);
   }
 
   @SneakyThrows
   @Override
-  public Set<PassportDto> getPassportsByFilter(
+  public Set<Passport> getPassportsByFilter(
       String personId, LocalDate startDate, LocalDate endDate, String status) {
     log.info(
         "Searching for passport by given date range [{}] - [{}] and status [{}]",
         startDate,
         endDate,
         status);
-    List<Passport> passportsPerPerson = officeRepository.findById(personId);
-    if (passportsPerPerson.isEmpty())
-      throw new PassportNotFoundException("There is no passports with such id");
-
-    Set<Passport> passports =
-        passportRepository.findByFilter(passportsPerPerson, startDate, endDate, status);
-    Set<PassportDto> passportDtos = new HashSet<>();
-    passports.forEach(passport -> passportDtos.add(passportEntitiesMapper.toDto(passport)));
-    return passportDtos;
+    List<Passport> passportsPerPerson = passportRepository.findByPersonId(personId);
+    return passportRepository.findByFilter(passportsPerPerson, startDate, endDate, status);
   }
 }
