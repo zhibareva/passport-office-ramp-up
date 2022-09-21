@@ -78,7 +78,7 @@ public class PersonsApiController {
   }
 
   @DeleteMapping(path = "/persons/{id}")
-  @ResponseStatus(code = HttpStatus.NO_CONTENT)
+  @ResponseStatus(code = HttpStatus.OK)
   public PersonResponse deletePerson(@PathVariable("id") String id) {
     return personEntitiesMapper.toResponse(personService.deletePerson(id));
   }

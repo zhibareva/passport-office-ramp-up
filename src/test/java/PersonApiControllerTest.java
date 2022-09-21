@@ -318,4 +318,15 @@ class PersonApiControllerTest {
     Assertions.assertEquals(200, response.statusCode());
     Assertions.assertNotEquals(passportId, response.jsonPath().getString("id"));
   }
+
+  @Test
+  void testPassportDelete() {
+    String id = createTestPerson().jsonPath().getString("id");
+    RestAssured.given()
+        .header(HttpHeaders.ACCEPT, ContentType.JSON)
+        .when()
+        .request(Method.DELETE, "/persons/" + id)
+        .then()
+        .statusCode(200);
+  }
 }
