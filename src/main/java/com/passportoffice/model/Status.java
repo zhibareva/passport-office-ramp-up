@@ -1,17 +1,16 @@
 package com.passportoffice.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
 public enum Status {
   ACTIVE("active"),
-
   INACTIVE("inActive"),
-
   LOST("lost");
 
+  @Getter
   private final String value;
-
-  Status(String value) {
-    this.value = value;
-  }
 
   @Override
   public String toString() {
