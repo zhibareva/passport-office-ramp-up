@@ -2,7 +2,7 @@ package com.passportoffice.controller;
 
 import com.passportoffice.controller.mapper.PassportEntitiesMapper;
 import com.passportoffice.controller.mapper.PersonEntitiesMapper;
-import com.passportoffice.dto.PassportDto;
+import com.passportoffice.controller.validation.PassportStatus;
 import com.passportoffice.dto.request.CreatePassportRequest;
 import com.passportoffice.dto.request.CreatePersonRequest;
 import com.passportoffice.dto.request.UpdatePassportRequest;
@@ -10,18 +10,18 @@ import com.passportoffice.dto.request.UpdatePersonRequest;
 import com.passportoffice.dto.response.PassportResponse;
 import com.passportoffice.dto.response.PersonResponse;
 import com.passportoffice.exception.PassportNotFoundException;
+import com.passportoffice.model.Passport;
 import com.passportoffice.model.Status;
-import com.passportoffice.repository.PersonRepository;
 import com.passportoffice.service.OfficeService;
 import com.passportoffice.service.PersonService;
-import com.passportoffice.validation.PassportStatus;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,15 +42,14 @@ public class PersonsApiController {
   private final PersonService personService;
   private final PassportEntitiesMapper passportEntitiesMapper;
   private final PersonEntitiesMapper personEntitiesMapper;
-  private final PersonRepository personRepository;
 
   @PostMapping(path = "/persons/{id}/passports")
-  @ResponseStatus(code = HttpStatus.CREATED)
+  @ResponseStatus(code = HttpStatus.OK)
   public PassportResponse addPassport(
       @PathVariable("id") String personId, @Valid @RequestBody CreatePassportRequest body)
       throws PassportNotFoundException {
 
-    PassportDto passportDto =
+    Passport passportDto =
         officeService.createPassport(
             personId,
             body.getType(),
@@ -63,7 +62,7 @@ public class PersonsApiController {
   }
 
   @PostMapping(path = "/persons")
-  @ResponseStatus(code = HttpStatus.CREATED)
+  @ResponseStatus(code = HttpStatus.OK)
   public PersonResponse createPerson(@Valid @RequestBody CreatePersonRequest body) {
 
     log.info("Request to create person entity with body [{}]", body.toString());
@@ -88,36 +87,26 @@ public class PersonsApiController {
   @ResponseStatus(code = HttpStatus.OK)
   public List<PassportResponse> getPassportsByFilter(
       @PathVariable("id") String id,
-      @PassportStatus(
-              anyOf = {Status.INACTIVE, Status.LOST, Status.ACTIVE},
-              enumClass = Status.class)
+      @PassportStatus(acceptedValues = {Status.INACTIVE, Status.LOST, Status.ACTIVE})
           @RequestParam(value = "status", required = false)
           String status,
-      @RequestParam(value = "startDate", required = false) String startDate,
-      @RequestParam(value = "endDate", required = false) String endDate) {
+      @DateTimeFormat(iso = ISO.DATE) @RequestParam(value = "startDate", required = false)
+          LocalDate startDate,
+      @DateTimeFormat(iso = ISO.DATE) @RequestParam(value = "endDate", required = false)
+          LocalDate endDate) {
 
-    List<PassportResponse> passportResponses = new ArrayList<>();
-
-    LocalDate localStartDate = startDate == null ? null : LocalDate.parse(startDate);
-    LocalDate localEndDate = endDate == null ? null : LocalDate.parse(endDate);
-
-    officeService
-        .getPassportsByFilter(id, localStartDate, localEndDate, status)
-        .forEach(
-            passportDto -> passportResponses.add(passportEntitiesMapper.toResponse(passportDto)));
-    return passportResponses;
+    return officeService.getPassportsByFilter(id, startDate, endDate, status).stream()
+        .map(passportEntitiesMapper::toResponse)
+        .collect(Collectors.toList());
   }
 
   @GetMapping(path = "/persons")
   @ResponseStatus(code = HttpStatus.OK)
   public List<PersonResponse> getPersonsByFilter(
       @RequestParam(value = "passportNumber", required = false) Long passportNumber) {
-
-    List<PersonResponse> personResponses = new ArrayList<>();
-    officeService
-        .getPersonsByFilter(passportNumber)
-        .forEach(personDto -> personResponses.add(personEntitiesMapper.toResponse(personDto)));
-    return personResponses;
+    return officeService.getPersonsByFilter(passportNumber).stream()
+        .map(personEntitiesMapper::toResponse)
+        .collect(Collectors.toList());
   }
 
   @GetMapping(path = "/persons/{id}")
@@ -127,24 +116,29 @@ public class PersonsApiController {
   }
 
   @PutMapping(path = "/persons/{personId}/passports/{passportId}")
-  @ResponseStatus(code = HttpStatus.ACCEPTED)
+  @ResponseStatus(code = HttpStatus.OK)
   public PassportResponse updatePassportPerPerson(
       @PathVariable("personId") String personId,
       @PathVariable("passportId") String passportId,
       @Valid @RequestBody UpdatePassportRequest body) {
 
-    PassportDto updatedPassport;
-    try {
-      updatedPassport = officeService.updatePassportPerPerson(personId, passportId, body);
-    } catch (PassportNotFoundException passportNotFoundException) {
-      throw new NoSuchElementException("There is no passport with such id");
-    }
+    Passport updatedPassport;
+      updatedPassport =
+          officeService.updatePassportPerPerson(
+              personId,
+              passportId,
+              body.getType(),
+              body.getNumber(),
+              body.getGivenDate(),
+              body.getExpirationDate(),
+              body.getDepartmentCode(),
+              body.getStatus());
 
     return passportEntitiesMapper.toResponse(updatedPassport);
   }
 
   @PutMapping(path = "/persons/{id}")
-  @ResponseStatus(code = HttpStatus.ACCEPTED)
+  @ResponseStatus(code = HttpStatus.OK)
   public PersonResponse updatePerson(
       @PathVariable("id") String personId, @Valid @RequestBody UpdatePersonRequest body) {
     return personEntitiesMapper.toResponse(

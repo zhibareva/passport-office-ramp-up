@@ -27,7 +27,7 @@ public class PassportsApiController {
 
   @SneakyThrows
   @DeleteMapping(path = "/passports/{id}")
-  @ResponseStatus(code = HttpStatus.NO_CONTENT)
+  @ResponseStatus(code = HttpStatus.OK)
   public PassportResponse deletePassport(@PathVariable("id") String id) {
     return mapper.toResponse(passportService.deletePassportById(id));
   }
