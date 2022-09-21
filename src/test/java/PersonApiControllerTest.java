@@ -150,17 +150,6 @@ class PersonApiControllerTest {
     Assertions.assertEquals("Smith", response.jsonPath().getString("lastName"));
   }
 
-  @Test
-  void testPersonDelete() {
-    String id = createTestPerson().jsonPath().getString("id");
-    RestAssured.given()
-        .header(HttpHeaders.ACCEPT, ContentType.JSON)
-        .when()
-        .request("DELETE", "/persons/{id}", id)
-        .then()
-        .statusCode(204);
-  }
-
   @ParameterizedTest
   @EnumSource(PassportType.class)
   void testPassportPost(PassportType passportType) {
