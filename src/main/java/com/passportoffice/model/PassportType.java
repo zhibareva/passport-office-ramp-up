@@ -12,8 +12,8 @@ public enum PassportType {
     return validity;
   }
 
-  private String value;
-  private int validity;
+  private final String value;
+  private final int validity;
 
   PassportType(String value, int validity) {
     this.value = value;
