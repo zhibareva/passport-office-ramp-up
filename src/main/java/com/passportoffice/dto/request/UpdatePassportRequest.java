@@ -1,9 +1,8 @@
 package com.passportoffice.dto.request;
 
+import com.passportoffice.controller.validation.PassportStatus;
 import com.passportoffice.model.PassportType;
 import com.passportoffice.model.Status;
-import com.passportoffice.validation.PassportNumber;
-import com.passportoffice.validation.PassportStatus;
 import java.time.LocalDate;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
@@ -17,7 +16,7 @@ public class UpdatePassportRequest {
 
   @NotNull private final PassportType type;
 
-  @NotNull @PassportNumber private final Long number;
+  @NotNull private final Long number;
 
   @NotNull @PastOrPresent private final LocalDate givenDate;
 
@@ -26,8 +25,6 @@ public class UpdatePassportRequest {
   @NotNull private final String departmentCode;
 
   @NotNull
-  @PassportStatus(
-      anyOf = {Status.INACTIVE, Status.LOST},
-      enumClass = Status.class)
+  @PassportStatus(acceptedValues={Status.ACTIVE, Status.LOST})
   private final Status status;
 }

@@ -6,6 +6,7 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NonNull;
 
 @Data
 @AllArgsConstructor
@@ -19,19 +20,10 @@ public class CreatePersonRequest {
   @Pattern(regexp = "^[a-zA-Z\\s]+$")
   private final String lastName;
 
-  @Past private final LocalDate dateOfBirth;
+  @Past @NonNull private final LocalDate dateOfBirth;
 
   @NotEmpty
   @Pattern(regexp = "^[a-zA-Z\\s]+$")
   private String birthCountry;
 
-  @Override
-  public String toString() {
-    return "\nCreatePersonRequest{" +
-        "\n\tfirstName='" + firstName + '\'' +
-        ", \n\tlastName='" + lastName + '\'' +
-        ", \n\tdateOfBirth=" + dateOfBirth +
-        ", \n\tbirthCountry='" + birthCountry + '\'' +
-        '}';
-  }
 }
