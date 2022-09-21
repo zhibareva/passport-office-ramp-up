@@ -2,7 +2,7 @@ package com.passportoffice.exception.handler;
 
 import com.passportoffice.dto.response.ErrorResponse;
 import com.passportoffice.exception.InvalidPassportStatusException;
-import com.passportoffice.exception.InvalidPassportTypeException;
+import com.passportoffice.exception.InvalidPassportException;
 import com.passportoffice.exception.PassportNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +22,10 @@ public class PassportExceptionHandler {
     return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
   }
 
-  @ExceptionHandler(InvalidPassportTypeException.class)
+  @ExceptionHandler(InvalidPassportException.class)
   @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
   public ResponseEntity<ErrorResponse> handleInvalidPassportTypeException(
-      InvalidPassportTypeException e) {
+      InvalidPassportException e) {
     ErrorResponse response =
         new ErrorResponse(
             HttpStatus.UNPROCESSABLE_ENTITY.value(),
