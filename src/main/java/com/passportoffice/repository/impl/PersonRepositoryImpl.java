@@ -24,7 +24,7 @@ public class PersonRepositoryImpl implements PersonRepository {
 
   @Override
   public Optional<Person> deleteById(String id) {
-    return Optional.of(persons.remove(id));
+    return Optional.ofNullable(persons.remove(id));
   }
 
   @Override
