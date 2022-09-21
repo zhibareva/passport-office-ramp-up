@@ -20,15 +20,4 @@ public class PersonResponse {
 
   @NonNull private final String birthCountry;
 
-    @Override
-    public String toString() {
-        return "\nPersonResponse{" +
-            "\n\tid='" + id + '\'' +
-            ", \n\tfirstName='" + firstName + '\'' +
-            ", \n\tlastName='" + lastName + '\'' +
-            ", \n\tdateOfBirth=" + dateOfBirth +
-            ", \n\tbirthCountry='" + birthCountry + '\'' +
-            '}';
-    }
-
 }

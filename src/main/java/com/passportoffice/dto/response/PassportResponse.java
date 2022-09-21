@@ -1,7 +1,7 @@
 package com.passportoffice.dto.response;
 
-import com.passportoffice.model.PassportType;
 import com.passportoffice.model.Status;
+import com.passportoffice.model.PassportType;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
