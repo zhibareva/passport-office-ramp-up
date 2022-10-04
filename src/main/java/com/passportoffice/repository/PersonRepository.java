@@ -12,5 +12,5 @@ public interface PersonRepository {
 
   Optional<Person> deleteById(String id);
 
-  Person save(String id, Person passportDto);
+  Person save(String id, Person person);
 }

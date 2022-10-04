@@ -1,4 +1,4 @@
-package com.passportoffice.utils;
+package com.passportoffice;
 
 import com.github.javafaker.Faker;
 import java.time.LocalDate;

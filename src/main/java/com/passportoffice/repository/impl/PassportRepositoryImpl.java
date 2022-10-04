@@ -46,21 +46,21 @@ public class PassportRepositoryImpl implements PassportRepository {
   public Set<Passport> findByStatus(Set<Passport> passports, String status) {
     return passports.stream()
         .filter(passportDto -> passportDto.getStatus().equals(Status.fromValue(status)))
-        .collect(Collectors.toSet());
+        .collect(Collectors.toUnmodifiableSet());
   }
 
   @Override
   public Set<Passport> findByStartDate(Set<Passport> passports, LocalDate startDate) {
     return passports.stream()
         .filter(passportDto -> passportDto.getGivenDate().isAfter(startDate))
-        .collect(Collectors.toSet());
+        .collect(Collectors.toUnmodifiableSet());
   }
 
   @Override
   public Set<Passport> findByEndDate(Set<Passport> passports, LocalDate endDate) {
     return passports.stream()
         .filter(passportDto -> passportDto.getGivenDate().isBefore(endDate))
-        .collect(Collectors.toSet());
+        .collect(Collectors.toUnmodifiableSet());
   }
 
   @Override
@@ -71,13 +71,6 @@ public class PassportRepositoryImpl implements PassportRepository {
 
     log.trace("Passports before filtering");
     buffer.forEach(passport -> log.trace("[{}]", passport.toString()));
-
-    if (status != null) {
-      filteredPassports = new HashSet<>(findByStatus(buffer, status));
-      buffer = new HashSet<>(filteredPassports);
-      log.trace("Passports after filtering by status");
-      filteredPassports.forEach(passport -> log.trace("[{}]", passport.toString()));
-    }
 
     if (startDate != null) {
       filteredPassports = new HashSet<>(findByStartDate(buffer, startDate));
@@ -93,24 +86,31 @@ public class PassportRepositoryImpl implements PassportRepository {
       filteredPassports.forEach(passport -> log.trace("[{}]", passport.toString()));
     }
 
+    if (status != null) {
+      filteredPassports = new HashSet<>(findByStatus(buffer, status));
+      buffer = new HashSet<>(filteredPassports);
+      log.trace("Passports after filtering by status");
+      filteredPassports.forEach(passport -> log.trace("[{}]", passport.toString()));
+    }
+
     filteredPassports = new HashSet<>(buffer);
 
     log.trace("Passports after filtering");
     filteredPassports.forEach(passport -> log.trace("[{}]", passport.toString()));
-    return filteredPassports;
+    return Collections.unmodifiableSet(filteredPassports);
   }
 
   @Override
   public List<Passport> findByPersonId(String personId) {
     return getPassports().values().stream()
         .filter(passportDto -> passportDto.getPersonId().equals(personId))
-        .collect(Collectors.toList());
+        .collect(Collectors.toUnmodifiableList());
   }
 
   @Override
   public List<Passport> findByPassportNumber(Long passportNumber) {
     return getPassports().values().stream()
         .filter(passportDto -> passportDto.getNumber().equals(passportNumber))
-        .collect(Collectors.toList());
+        .collect(Collectors.toUnmodifiableList());
   }
 }

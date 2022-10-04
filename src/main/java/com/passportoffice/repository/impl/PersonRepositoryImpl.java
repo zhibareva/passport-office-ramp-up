@@ -28,8 +28,8 @@ public class PersonRepositoryImpl implements PersonRepository {
   }
 
   @Override
-  public Person save(String id, Person passportDto) {
-    persons.put(id, passportDto);
-    return passportDto;
+  public Person save(String id, Person person) {
+    persons.put(id, person);
+    return person;
   }
 }

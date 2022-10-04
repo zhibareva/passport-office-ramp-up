@@ -8,7 +8,7 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import com.passportoffice.controller.validation.validator.EnumValidator;
+import com.passportoffice.controller.validation.validator.PassportStatusValidator;
 import com.passportoffice.model.Status;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -19,7 +19,7 @@ import javax.validation.Payload;
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = EnumValidator.class)
+@Constraint(validatedBy = PassportStatusValidator.class)
 public @interface PassportStatus {
   String message() default "Value is not valid";
 

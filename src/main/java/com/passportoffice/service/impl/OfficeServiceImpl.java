@@ -9,7 +9,6 @@ import com.passportoffice.model.Person;
 import com.passportoffice.repository.PassportRepository;
 import com.passportoffice.repository.PersonRepository;
 import com.passportoffice.service.OfficeService;
-import com.passportoffice.utils.DataGenerator;
 import com.passportoffice.utils.IdGenerator;
 import com.passportoffice.utils.PassportNumberGenerator;
 import java.time.LocalDate;
@@ -34,7 +33,6 @@ public class OfficeServiceImpl implements OfficeService {
   private final PersonRepository personRepository;
   private final IdGenerator idGenerator;
   private final PassportNumberGenerator passportNumberGenerator;
-  private final DataGenerator dataGenerator;
 
   @Override
   @NonNull
@@ -140,7 +138,7 @@ public class OfficeServiceImpl implements OfficeService {
         passport.getPersonId(),
         passport.getType(),
         passportNumberGenerator.getNumber(),
-        dataGenerator.getCurrentDate().plusDays(3),
+        LocalDate.now().plusDays(3),
         passport.getDepartmentCode(),
         Status.ACTIVE);
   }
