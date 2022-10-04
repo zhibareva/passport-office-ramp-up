@@ -1,5 +1,6 @@
 package com.passportoffice.controller;
 
+import com.passportoffice.controller.annotation.APIController;
 import com.passportoffice.controller.mapper.PassportEntitiesMapper;
 import com.passportoffice.controller.mapper.PersonEntitiesMapper;
 import com.passportoffice.controller.validation.PassportStatus;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@APIController
 @AllArgsConstructor
 @Slf4j
 public class PersonsApiController {
